@@ -1,0 +1,33 @@
+- name: install nginx
+  apt:
+    package:      nginx
+    force:        yes
+    update_cache: yes
+
+- name: remove sites-enabled/default conf
+  file:
+    path:  /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: put simple-html.conf
+  copy:
+    src:  simple-html.conf
+    dest: /etc/nginx/conf.d/simple-html.conf
+
+- name: create document root
+  file:
+    path:  /var/www
+    state: directory
+    mode:  0755
+
+- name: put content
+  template:
+    src:  index.html.j2
+    dest: /var/www/{{ html_filename }}.html
+    mode: 0644
+
+- name: restart nginx service
+  service:
+    name:    nginx
+    state:   restarted
+    enabled: yes
